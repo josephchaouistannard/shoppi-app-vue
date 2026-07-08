@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Shoppi</string>
+    <string name="title_activity_main">Shoppi</string>
+    <string name="package_name">com.josephchaouistannard.shoppi</string>
+    <string name="custom_url_scheme">com.josephchaouistannard.shoppi</string>
+</resources>

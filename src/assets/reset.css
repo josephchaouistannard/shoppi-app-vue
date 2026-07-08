@@ -1,0 +1,98 @@
+/* ===== Base reset ===== */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html, body {
+  height: 100%;
+  width: 100%;
+}
+
+body {
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeSpeed;
+}
+
+img, picture, video, canvas, svg {
+  display: block;
+  max-width: 100%;
+}
+
+input, button, textarea, select {
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+}
+
+button {
+  cursor: pointer;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+ul, ol {
+  list-style: none;
+}
+
+/* ===== Android / Capacitor interaction fixes ===== */
+
+/* Removes the gray flash highlight on tap (Android WebView) */
+* {
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Prevents double-tap-to-zoom triggering on buttons/links and
+   removes the 300ms tap delay quirk on some WebViews */
+button, a, input, select, textarea, [role="button"] {
+  touch-action: manipulation;
+}
+
+/* Stops accidental text selection on long-press (feels more "app-like") */
+body {
+  -webkit-user-select: none;
+  user-select: none;
+}
+
+/* Re-enable selection for actual text content / inputs */
+input, textarea, [contenteditable="true"], .selectable {
+  -webkit-user-select: text;
+  user-select: text;
+}
+
+/* Prevents the blue/gray tap rectangle on buttons in older WebViews */
+button, input, textarea {
+  -webkit-appearance: none;
+  appearance: none;
+}
+
+/* Disables pull-to-refresh / overscroll bounce glow on Android */
+html, body {
+  overscroll-behavior: none;
+}
+
+/* Prevents iOS/Android long-press context menu & image dragging */
+img, a {
+  -webkit-touch-callout: none;
+  -webkit-user-drag: none;
+}
+
+/* Prevents pinch-zoom on the whole app (typical for packaged apps) */
+html {
+  touch-action: pan-x pan-y;
+}
+
+/* Safe-area support for notches / gesture bars */
+body {
+  padding-top: env(safe-area-inset-top);
+  padding-bottom: env(safe-area-inset-bottom);
+}
