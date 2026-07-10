@@ -5,20 +5,29 @@ import type { TItem } from '../types/TItem';
 import { useRouter } from 'vue-router';
 import { useSettingsStore } from '../stores/settings'
 import { categoriseWithAI } from '@/utils/categoriseWithAI';
+import { useToast } from '@/composables/toast'
 
+const toasts = useToast()
 const settingsStore = useSettingsStore()
 const itemsStore = useItemsStore()
+const router = useRouter()
 
 const newItemName = ref('')
 const categorisationInProgress = ref(false)
 
-const router = useRouter()
 
 onMounted(() => {
-  itemsStore.triggerDebouncedSync()
-
-  window.addEventListener('focus', () => {
+  if (!settingsStore.missingApiSettings) {
     itemsStore.triggerDebouncedSync()
+  } else {
+    toasts.addToast('Sync server not configured', 'info')
+  }
+
+  // Works on web but not on android
+  window.addEventListener('focus', () => {
+    if (!settingsStore.missingApiSettings) {
+      itemsStore.triggerDebouncedSync()
+    }
   })
 })
 
@@ -29,28 +38,43 @@ function handleAddItem() {
   itemsStore.addItem(newItemName.value)
   newItemName.value = ""
 }
+
 async function handleCategorisation() {
   const activeProvider = settingsStore.activeProvider
 
   if (!activeProvider) {
-    console.warn("No AI provider chosen")
+    toasts.addToast('No AI provider chosen', 'warn')
     return
   }
 
   if (!activeProvider.apiKey) {
-    console.warn("No API key for active AI provider")
+    toasts.addToast('No API key for chosen provider', 'warn')
+    return
+  }
+
+  if (itemsStore.items.length === 0) {
+    toasts.addToast('No items to categorise', 'warn')
     return
   }
 
   categorisationInProgress.value = true
-  const response = await categoriseWithAI(activeProvider.name, itemsStore.items, activeProvider.apiKey, settingsStore.langCategories)
-  categorisationInProgress.value = false;
-  if (response['items']) {
-    response['items'].forEach((item: TItem) => {
-      console.log(`Updating category for ${item.id}: ${item.category}`)
-      itemsStore.updateCategory(item.id, item.category)
-    })
+  try {
+    const response = await categoriseWithAI(activeProvider.name, itemsStore.items, activeProvider.apiKey, settingsStore.langCategories)
+    categorisationInProgress.value = false;
+
+    if (response['items']) {
+      response['items'].forEach((item: TItem) => {
+        console.log(`Updating category for ${item.id}: ${item.category}`)
+        itemsStore.updateCategory(item.id, item.category)
+      })
+    } else {
+      toasts.addToast('No list returned', 'error')
+    }
+  } catch (err) {
+    toasts.addToast('Something went wrong', 'error')
+    console.error('Categorisation error', err)
   }
+
 }
 
 function handleRemove(id: string) {

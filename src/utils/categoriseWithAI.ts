@@ -120,7 +120,7 @@ Example output (Assuming the laguage choses by the user for the categories is En
  * @param items
  * @param apiKey
  * @param langCategories
- * @returns Full JSON list with categories, or null if failed
+ * @returns Full JSON list with categories
  */
 export async function categoriseWithAI(providerName: string, items: TItem[], apiKey: string, langCategories: string) {
   const systemPrompt = getSystemPrompt(langCategories);
@@ -128,14 +128,14 @@ export async function categoriseWithAI(providerName: string, items: TItem[], api
 
     switch (providerName) {
       case "Gemini":
-        return categoriseWithGemini(items, apiKey, systemPrompt);
+        return await categoriseWithGemini(items, apiKey, systemPrompt);
 
       case "Groq":
-        return categoriseWithGroq(items, apiKey, systemPrompt);
+        return await categoriseWithGroq(items, apiKey, systemPrompt);
     }
   } catch (error) {
     console.error("Error categorising with AI", error)
-    return null
+    throw error
   }
 }
 

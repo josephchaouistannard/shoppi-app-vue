@@ -50,4 +50,8 @@ const { toasts, removeToast } = useToast()
 .error {
   background-color: #d9534f; /* Red */
 }
+
+.warn {
+  background-color: #d28c15; /* Red */
+}
 </style>

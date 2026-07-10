@@ -3,13 +3,13 @@ import { ref } from 'vue'
 type Toast = {
   message:string,
   id:string,
-  type: 'success'| 'error' | 'info'
+  type: 'success'| 'error' | 'info' | 'warn'
 }
 
 const toasts = ref<Toast[]>([])
 
 export function useToast() {
-  const addToast = (message: string, type: 'success'|'error'|'info' = 'info', duration: number = 3000) => {
+  const addToast = (message: string, type: 'success'|'error'|'info' | 'warn' = 'info', duration: number = 3000) => {
     const id = crypto.randomUUID()
     toasts.value.push({
       message, type, id

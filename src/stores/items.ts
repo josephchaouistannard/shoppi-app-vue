@@ -2,10 +2,16 @@ import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
 import type { TItem } from '../types/TItem'
 import { useSettingsStore } from './settings'
+import { useToast } from '@/composables/toast'
+
+const toasts = useToast()
 
 export const useItemsStore = defineStore('items', () => {
   const settingsStore = useSettingsStore()
+
+  // ITEMS
   const items = ref<TItem[]>([])
+  const ITEMS_KEY = "items"
   const count = computed(() => items.value.length)
   const categoriesNotDeleted = computed(() =>
     [...new Set(
@@ -18,14 +24,16 @@ export const useItemsStore = defineStore('items', () => {
     return (cat: string | null) =>
       items.value.filter(item => item.category === cat && !item.isDeleted)
   })
-  const isInitialised = ref(false)
-  const ITEMS_KEY = "items"
+
+
+  // SYNC
   const LAST_SYNCED_KEY = "lastSyncedAt"
+  const lastSyncedAt = ref<string | null>(localStorage.getItem(LAST_SYNCED_KEY))
   const isSyncing = ref(false)
   const justSynced = ref(false)
   const syncError = ref(false)
-  const lastSyncedAt = ref<string | null>(localStorage.getItem(LAST_SYNCED_KEY))
 
+  const isInitialised = ref(false)
   async function initialise() {
     if (isInitialised.value) return
 
@@ -95,8 +103,8 @@ export const useItemsStore = defineStore('items', () => {
     if (isSyncing.value) return
 
     if (!settingsStore.apiUrl || !settingsStore.apiToken) {
-      console.warn('Sync aborted: API credentials are not set.')
-      throw new Error('Missing sync api credentials')
+      toasts.addToast('Sync server settings configured', 'error')
+      return
     }
 
     isSyncing.value = true
@@ -115,6 +123,7 @@ export const useItemsStore = defineStore('items', () => {
 
       if (!response.ok) {
         syncError.value = true
+        toasts.addToast(`Server returned ${response.status} - ${response.statusText}`, 'error')
         throw new Error('Sync failed')
       }
       const data = await response.json()
@@ -134,6 +143,7 @@ export const useItemsStore = defineStore('items', () => {
       setTimeout(() => {
         syncError.value = false
       }, 4000)
+      toasts.addToast('Sync failed (offline or server down)', 'warn')
       console.warn('Sync failed (offline or server down). Storing changes locally.', error)
     } finally {
       isSyncing.value = false

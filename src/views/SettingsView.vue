@@ -51,14 +51,6 @@ function handleSetActiveProvider(name: string) {
   settingsStore.setActiveProvider(name)
 }
 
-const handleSuccess = () => {
-  toasts.addToast('Action completed successfully!', 'success')
-}
-
-const handleCustomDuration = () => {
-  toasts.addToast('This toast stays for 5 seconds!', 'error', 5000)
-}
-
 </script>
 
 <template>
@@ -122,15 +114,8 @@ const handleCustomDuration = () => {
           </div>
         </div>
       </div>
-
     </div>
   </div>
-
-  <div>
-    <button @click="handleSuccess">Show Toast</button>
-    <button @click="handleCustomDuration">Show Long Toast</button>
-  </div>
-
 </template>
 
 <style scoped>
