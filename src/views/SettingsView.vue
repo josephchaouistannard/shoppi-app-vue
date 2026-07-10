@@ -2,8 +2,6 @@
 import { ref, onMounted } from 'vue';
 import { useItemsStore } from '../stores/items'
 import { useSettingsStore } from '../stores/settings'
-import { categoriseWithGemini } from '@/utils/gemini';
-import type { TItem } from '../types/TItem';
 import { useRouter } from 'vue-router';
 
 const settingsStore = useSettingsStore()
@@ -12,7 +10,8 @@ const router = useRouter()
 
 const newUrl = ref('')
 const newToken = ref('')
-const newGeminiKey = ref('')
+const newLangCat = ref('')
+const newProviderApiKey = ref('')
 
 onMounted(() => {
   settingsStore.initialise()
@@ -25,8 +24,19 @@ function handleSaveUrl() {
 function handleSaveToken() {
   settingsStore.setApiToken(newToken.value)
 }
-function handleSaveGeminiKey() {
-  settingsStore.setGeminiApiKey(newGeminiKey.value)
+function handleSaveLangCat() {
+  settingsStore.setLangCategories(newLangCat.value)
+}
+function handleSaveProviderApiKey() {
+  const name = settingsStore.activeProvider?.name
+  if (name) {
+    settingsStore.updateProviderApiKey(name, newProviderApiKey.value)
+  }
+  newProviderApiKey.value = ''
+}
+
+function handleSetActiveProvider(name: string) {
+  settingsStore.setActiveProvider(name)
 }
 
 </script>
@@ -34,12 +44,13 @@ function handleSaveGeminiKey() {
 <template>
   <div class="viewContainer">
     <header>
-      <img src="../assets/backarrow.svg" @click="router.back()"/>
+      <img src="../assets/backarrow.svg" @click="router.back()" />
     </header>
     <div class="formContainer">
       <div class="fc">
+        <h4>Sync Server</h4>
         <p>API URL:</p>
-        <small v-if="settingsStore.apiUrl">{{settingsStore.apiUrl}}</small>
+        <small v-if="settingsStore.apiUrl">{{ settingsStore.apiUrl }}</small>
         <input type="text" v-model="newUrl" @keyup.enter="handleSaveUrl" />
       </div>
       <div class="fr endButtonContainer">
@@ -47,7 +58,7 @@ function handleSaveGeminiKey() {
       </div>
       <div class="fc">
         <p>API Token:</p>
-        <small v-if="settingsStore.apiToken">{{settingsStore.apiToken}}</small>
+        <small v-if="settingsStore.apiToken">{{ settingsStore.apiToken }}</small>
         <input type="text" v-model="newToken" @keyup.enter="handleSaveToken" />
       </div>
       <div class="fr endButtonContainer">
@@ -56,25 +67,80 @@ function handleSaveGeminiKey() {
     </div>
     <div class="formContainer">
       <div class="fc">
-        <p>Magic Gemini Key:</p>
-        <small v-if="settingsStore.geminiApiKey">Key set</small>
-        <input type="text" v-model="newGeminiKey" @keyup.enter="handleSaveGeminiKey" />
+        <h4>Language</h4>
+        <p>Language to use for categories:</p>
+        <small v-if="settingsStore.langCategories">{{ settingsStore.langCategories }}</small>
+        <input type="text" v-model="newLangCat" @keyup.enter="handleSaveLangCat" />
       </div>
       <div class="fr endButtonContainer">
-        <button @click="handleSaveGeminiKey">Save</button>
+        <button @click="handleSaveLangCat">Save</button>
       </div>
+    </div>
+
+
+
+    <div class="formContainer">
+      <div class="fc">
+        <h4>AI Categorisation</h4>
+        <p>Choose active provider:</p>
+
+        <div class="providerRadio" v-for="provider in settingsStore.providers">
+          <label :for="provider.name" :key="provider.name">
+            {{ provider.name }}
+          </label>
+          <input type="radio" :id="provider.name" name="providerName" :value="provider.name"
+            :checked="provider.name === settingsStore.activeProvider?.name"
+            @change="handleSetActiveProvider(provider.name)">
+        </div>
+        <div v-if="settingsStore.activeProvider">
+          <p>Set API key for {{ settingsStore.activeProvider.name }}:</p>
+          <small v-if="settingsStore.activeProvider.apiKey">Key set!</small>
+          <small v-else>No key set</small>
+          <input type="text" v-model="newProviderApiKey" @keyup.enter="handleSaveProviderApiKey" />
+          <div class="fr endButtonContainer">
+            <button @click="handleSaveProviderApiKey">Save</button>
+          </div>
+        </div>
+      </div>
+
     </div>
   </div>
 </template>
 
 <style scoped>
+input[type="radio"] {
+  appearance: auto;
+  -webkit-appearance: radio;
+  cursor: pointer;
+  width: 20px;
+}
+small {
+  padding-top: var(--space-sm);
+}
+
+.providerRadio {
+  margin: auto;
+  display: flex;
+  width: 90%;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-xs) var(--space-md)
+}
+
+h4 {
+  width: 100%;
+  text-align: center;
+}
+
 .syncInProgress {
   color: grey;
 }
 
-.syncSuccess{
+.syncSuccess {
   color: green;
 }
+
 .syncError {
   color: darkred;
 }

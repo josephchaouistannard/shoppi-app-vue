@@ -1,16 +1,16 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
 import { useItemsStore } from '../stores/items'
-import { categoriseWithGemini } from '@/utils/gemini';
 import type { TItem } from '../types/TItem';
 import { useRouter } from 'vue-router';
 import { useSettingsStore } from '../stores/settings'
+import { categoriseWithAI } from '@/utils/categoriseWithAI';
 
 const settingsStore = useSettingsStore()
 const itemsStore = useItemsStore()
 
 const newItemName = ref('')
-const workingMagic = ref(false)
+const categorisationInProgress = ref(false)
 
 const router = useRouter()
 
@@ -21,17 +21,30 @@ onMounted(() => {
     itemsStore.triggerDebouncedSync()
   })
 })
-function handleAdd() {
+
+function handleAddItem() {
   if (newItemName.value.trim() === '') {
     return
   }
   itemsStore.addItem(newItemName.value)
   newItemName.value = ""
 }
-async function handleMagic() {
-  workingMagic.value = true
-  const response = await categoriseWithGemini(itemsStore.items, settingsStore.geminiApiKey)
-  workingMagic.value = false;
+async function handleCategorisation() {
+  const activeProvider = settingsStore.activeProvider
+
+  if (!activeProvider) {
+    console.warn("No AI provider chosen")
+    return
+  }
+
+  if (!activeProvider.apiKey) {
+    console.warn("No API key for active AI provider")
+    return
+  }
+
+  categorisationInProgress.value = true
+  const response = await categoriseWithAI(activeProvider.name, itemsStore.items, activeProvider.apiKey, settingsStore.langCategories)
+  categorisationInProgress.value = false;
   if (response['items']) {
     response['items'].forEach((item: TItem) => {
       console.log(`Updating category for ${item.id}: ${item.category}`)
@@ -39,9 +52,11 @@ async function handleMagic() {
     })
   }
 }
+
 function handleRemove(id: string) {
   itemsStore.removeItem(id)
 }
+
 </script>
 
 <template>
@@ -49,14 +64,11 @@ function handleRemove(id: string) {
     <header>
       <h2>Shopping List</h2>
       <div class="syncIndicator">
-        <!-- <p class="syncInProgress" v-if="itemsStore.isSyncing">Syncing...</p>
-        <p class="syncSuccess" v-else-if="itemsStore.justSynced">Synced!</p>
-        <p class="syncError" v-else-if="itemsStore.syncError">Error Syncing!</p> -->
         <img class="syncInProgress" src="../assets/syncInProgress.svg" v-if="itemsStore.isSyncing" />
         <img class="syncSuccess" src="../assets/syncSuccess.svg" v-else-if="itemsStore.justSynced" />
         <img class="syncError" src="../assets/syncError.svg" v-else-if="itemsStore.syncError" />
       </div>
-      <button v-if="!workingMagic" class="magicBtn" @click="handleMagic">Magic</button>
+      <button v-if="!categorisationInProgress" class="magicBtn" @click="handleCategorisation">Magic</button>
       <div v-else class="workingMagic">
         <div class="spinner"></div>
       </div>
@@ -65,10 +77,10 @@ function handleRemove(id: string) {
     <div class="formContainer">
       <div class="fc">
         <p>Add a new item:</p>
-        <input type="text" v-model="newItemName" @keyup.enter="handleAdd" />
+        <input type="text" v-model="newItemName" @keyup.enter="handleAddItem" />
       </div>
       <div class="fr endButtonContainer">
-        <button @click="handleAdd">Add</button>
+        <button @click="handleAddItem">Add</button>
       </div>
     </div>
     <div class="shoppingList">
