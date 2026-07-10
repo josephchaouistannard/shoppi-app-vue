@@ -86,49 +86,43 @@ async function handleProviderKeyReset(name: string) {
 <template>
   <div class="viewContainer">
     <header>
-      <img src="../assets/backarrow.svg" @click="router.back()" />
+      <img class="backBtn" src="../assets/backarrow.svg" @click="router.back()" />
     </header>
-    <div class="formContainer">
-      <div class="fc">
-        <h4>Sync Server</h4>
-        <p>API URL:</p>
-        <small v-if="settingsStore.apiUrl">{{ settingsStore.apiUrl }}</small>
+    <section>
+      <h4>Sync Server</h4>
+      <small>API URL:</small>
+      <small v-if="settingsStore.apiUrl">{{ settingsStore.apiUrl }}</small>
+      <div class="textInputContainer">
+
         <input type="text" v-model="newUrl" @keyup.enter="handleSaveUrl" />
+        <img class="saveBtn" src="../assets/save.svg" @click="handleSaveUrl" />
       </div>
-      <div class="fr endButtonContainer">
-        <button @click="handleSaveUrl">Save</button>
-      </div>
-      <div class="fc">
-        <p>API Key:</p>
-        <small v-if="settingsStore.apiToken">{{ settingsStore.apiToken }}</small>
+      <small>API Key:</small>
+      <small v-if="settingsStore.apiToken">{{ settingsStore.apiToken }}</small>
+      <div class="textInputContainer">
         <input type="text" v-model="newToken" @keyup.enter="handleSaveToken" />
-      </div>
-      <div class="fr endButtonContainer">
-        <button @click="handleSaveToken">Save</button>
+        <img class="saveBtn" src="../assets/save.svg" @click="handleSaveToken" />
       </div>
       <div class="fr endButtonContainer">
         <button @click="handleSyncServerReset">Reset</button>
       </div>
-    </div>
-    <div class="formContainer">
-      <div class="fc">
-        <h4>Language</h4>
-        <p>Language to use for categories:</p>
-        <small v-if="settingsStore.langCategories">{{ settingsStore.langCategories }}</small>
+    </section>
+    <section>
+      <h4>Language</h4>
+      <small>Language to use for categories: </small>
+      <small v-if="settingsStore.langCategories">{{ settingsStore.langCategories }}</small>
+      <div class="textInputContainer">
         <input type="text" v-model="newLangCat" @keyup.enter="handleSaveLangCat" />
+        <img class="saveBtn" src="../assets/save.svg" @click="handleSaveLangCat" />
       </div>
-      <div class="fr endButtonContainer">
-        <button @click="handleSaveLangCat">Save</button>
-      </div>
-    </div>
+    </section>
 
 
 
-    <div class="formContainer">
+    <section>
       <div class="fc">
         <h4>AI Categorisation</h4>
-        <p>Choose active provider:</p>
-
+        <small>Choose active provider:</small>
         <div class="providerRadio" v-for="provider in settingsStore.providers">
           <label :for="provider.name" :key="provider.name">
             {{ provider.name }}
@@ -141,18 +135,36 @@ async function handleProviderKeyReset(name: string) {
             @change="handleSetActiveProvider(provider.name)">
         </div>
         <div v-if="settingsStore.activeProvider">
-          <p>Set API key for {{ settingsStore.activeProvider.name }}:</p>
-          <input type="text" v-model="newProviderApiKey" @keyup.enter="handleSaveProviderApiKey" />
-          <div class="fr endButtonContainer">
-            <button @click="handleSaveProviderApiKey">Save</button>
+          <small>Set API key for {{ settingsStore.activeProvider.name }}:</small>
+          <div class="textInputContainer">
+            <input type="text" v-model="newProviderApiKey" @keyup.enter="handleSaveProviderApiKey" />
+            <img class="saveBtn" src="../assets/save.svg" @click="handleSaveProviderApiKey" />
           </div>
         </div>
       </div>
-    </div>
+    </section>
   </div>
 </template>
 
 <style scoped>
+.saveBtn,
+.savedKey,
+.backBtn {
+  width: var(--icon-size);
+  height: var(--icon-size);
+  transition: 0.2s all ease-in-out;
+}
+
+.saveBtn:active,
+.savedKey:active,
+.backBtn:active {
+  transform: scale(1.2);
+}
+
+.noKeySaved {
+  opacity: 0;
+}
+
 input[type="radio"] {
   appearance: auto;
   -webkit-appearance: radio;
@@ -165,28 +177,11 @@ p {
   padding-top: var(--space-xs);
 }
 
-.savedKey {
-  transition: 0.1s all ease-in-out;
-}
-
-.savedKey:hover {
-  cursor: pointer
-}
-
-.savedKey:active {
-  transform: scale(1.5);
-}
-
-.noKeySaved {
-  opacity: 0;
-}
-
 .providerRadio {
   margin: auto;
   display: grid;
   grid-template-columns: 1fr 70px 50px;
   align-items: center;
-  width: 90%;
   padding: var(--space-xs) var(--space-md);
 }
 
@@ -200,28 +195,6 @@ h4 {
   text-align: center;
 }
 
-.syncInProgress {
-  color: grey;
-}
-
-.syncSuccess {
-  color: green;
-}
-
-.syncError {
-  color: darkred;
-}
-
-.fr {
-  display: flex;
-  flex-direction: row;
-}
-
-.fc {
-  display: flex;
-  flex-direction: column;
-}
-
 .viewContainer {
   max-width: 420px;
   margin: 1rem auto;
@@ -231,10 +204,12 @@ h4 {
 }
 
 header {
+  width: 90%;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 0.6rem;
+  padding: 0.3rem;
+  margin: auto;
 }
 
 header h2 {
@@ -243,84 +218,9 @@ header h2 {
   font-weight: 600;
 }
 
-/* Buttons */
-button {
-  border: 1px solid var(--color-border, #d9d9d9);
-  border-radius: var(--radius-sm, 6px);
-  padding: 0.35em 0.7em;
-  background: var(--color-bg, #fff);
-  font-size: 0.85rem;
-  cursor: pointer;
-  transition: all 0.15s ease-in-out;
-}
-
-button:hover {
-  border-color: var(--color-primary, #888);
-}
-
-button:active {
-  background-color: var(--color-muted, #f0f0f0);
-}
-
-.magicBtn,
-.workingMagic {
-  width: 80px;
-  height: 32px;
-}
-
-.workingMagic {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.spinner {
-  width: 18px;
-  height: 18px;
-  border: 2px solid #d8c7ff;
-  border-top-color: #7c4dff;
-  border-radius: 50%;
-  animation: spin 0.8s linear infinite;
-}
-
-@keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
-}
-
-.magicBtn {
-  background: linear-gradient(135deg, #f5f0ff, #ede4ff);
-  border-color: #d8c7ff;
-  font-weight: 500;
-}
-
-.removeBtn {
-  color: #b3261e;
-  border-color: #f2c9c6;
-  background: #fdf3f2;
-  font-size: 0.8rem;
-  padding: 0.3em 0.6em;
-}
-
-.removeBtn:hover {
-  background: #fbe4e2;
-  border-color: #e39a95;
-}
-
-/* Form */
-.formContainer {
-  border: 1px solid var(--color-border, #e0e0e0);
-  border-radius: var(--radius-sm, 8px);
-  padding: 0.6em;
-  background: var(--color-surface, #fafafa);
-  margin-bottom: 0.75rem;
-}
-
-.formContainer .fc p {
-  margin: 0 0 0.25em;
-  font-size: 0.78rem;
-  color: var(--color-text-muted, #666);
+section {
+  padding: 0.5rem;
+  border-bottom: 2px var(--color-border) solid
 }
 
 input {
@@ -338,43 +238,16 @@ input:focus {
 }
 
 .endButtonContainer {
+  display: flex;
+  flex-direction: row;
   padding-top: 0.35em;
   justify-content: end;
 }
 
-/* Shopping list */
-.categoryGroup {
-  margin-bottom: 0.2rem;
-}
-
-.categoryHeader {
-  font-size: 0.7rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  letter-spacing: 0.04em;
-  color: var(--color-text-muted, #888);
-  padding-bottom: 0.2em;
-  border-bottom: 1px solid var(--color-border, #eee);
-  margin-bottom: 0.1em;
-}
-
-.listItem {
+.textInputContainer {
+  display: flex;
+  flex-direction: row;
   align-items: center;
-  justify-content: space-between;
-  padding: 0.1em 0.1em;
-  border-bottom: 1px solid var(--color-border, #f0f0f0);
-}
-
-.listItem:last-child {
-  border-bottom: none;
-}
-
-.itemInfo {
-  width: 100%;
-}
-
-.itemInfo p {
-  margin: 0;
-  font-size: 0.9rem;
+  gap: var(--space-md);
 }
 </style>

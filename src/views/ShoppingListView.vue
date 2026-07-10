@@ -86,28 +86,28 @@ function handleRemove(id: string) {
 <template>
   <div class="viewContainer">
     <header>
-      <h2>Shopping List</h2>
+      <h2>Shoppi</h2>
       <div class="syncIndicator">
         <img class="syncInProgress" src="../assets/syncInProgress.svg" v-if="itemsStore.isSyncing" />
         <img class="syncSuccess" src="../assets/syncSuccess.svg" v-else-if="itemsStore.justSynced" />
         <img class="syncError" src="../assets/syncError.svg" v-else-if="itemsStore.syncError" />
       </div>
-      <button v-if="!categorisationInProgress" class="magicBtn" @click="handleCategorisation">Magic</button>
-      <div v-else class="workingMagic">
+      <img v-if="!categorisationInProgress" src="../assets/categories.svg" class="catBtn"
+        @click="handleCategorisation" />
+      <div v-else class="catSpinnerContainer">
         <div class="spinner"></div>
       </div>
-      <img src="../assets/settings.svg" @click="router.push('/settings')" />
+      <img class="settingsBtn" src="../assets/settings.svg" @click="router.push('/settings')" />
     </header>
-    <div class="formContainer">
-      <div class="fc">
-        <p>Add a new item:</p>
+
+    <section class="newItemSection">
+      <small>Add a new item:</small>
+      <div>
         <input type="text" v-model="newItemName" @keyup.enter="handleAddItem" />
+        <img src="../assets/add.svg" class="addBtn" @click="handleAddItem" />
       </div>
-      <div class="fr endButtonContainer">
-        <button @click="handleAddItem">Add</button>
-      </div>
-    </div>
-    <div class="shoppingList">
+    </section>
+    <section class="shoppingList">
       <div v-for="cat in itemsStore.categories" class="categoryGroup">
         <div class="categoryHeader">
           <strong>
@@ -115,38 +115,17 @@ function handleRemove(id: string) {
           </strong>
         </div>
         <div v-for="item in itemsStore.itemsByCategory(cat)" :key="item.id">
-          <div class="listItem fr">
-            <div class="itemInfo">
-              <p>{{ item.name }}</p>
-              <!-- <p class="softDeleteIndicator" v-if="item.isDeleted">X</p>
-                          <small>{{ item.id }}</small>
-            <p v-if="item.category">{{ item.category }}</p>
-            <small>Synced at: {{ item.syncedAt }}</small>
-            <small>Updated at: {{ item.updatedAt }}</small> -->
-            </div>
-            <div class="fr endButtonContainer">
-              <button class="removeBtn" @click="handleRemove(item.id)">Remove</button>
-            </div>
+          <div class="listItem">
+            <p>{{ item.name }}</p>
+            <img src="../assets/delete.svg" class="removeBtn" @click="handleRemove(item.id)" />
           </div>
         </div>
       </div>
-    </div>
+    </section>
   </div>
 </template>
 
 <style scoped>
-.syncInProgress {
-  color: grey;
-}
-
-.syncSuccess {
-  color: green;
-}
-
-.syncError {
-  color: darkred;
-}
-
 .fr {
   display: flex;
   flex-direction: row;
@@ -165,11 +144,41 @@ function handleRemove(id: string) {
   color: var(--color-text, #1a1a1a);
 }
 
+.newItemSection {
+  width: 95%;
+  margin: var(--space-lg) auto;
+}
+
+.newItemSection div {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--space-md);
+}
+
+.addBtn,
+.removeBtn,
+.catBtn,
+.settingsBtn {
+  width: var(--icon-size);
+  height: var(--icon-size);
+  transition: 0.2s all ease-in-out;
+}
+
+.addBtn:active,
+.removeBtn:active,
+.catBtn:active,
+.settingsBtn:active {
+  transform: scale(1.2);
+}
+
 header {
+  width: 90%;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  margin-bottom: 0.6rem;
+  padding: 0.3rem;
+  margin: auto;
 }
 
 header h2 {
@@ -178,42 +187,23 @@ header h2 {
   font-weight: 600;
 }
 
-/* Buttons */
-button {
-  border: 1px solid var(--color-border, #d9d9d9);
-  border-radius: var(--radius-sm, 6px);
-  padding: 0.35em 0.7em;
-  background: var(--color-bg, #fff);
-  font-size: 0.85rem;
-  cursor: pointer;
-  transition: all 0.15s ease-in-out;
+.catBtn,
+.catSpinnerContainer {
+  width: var(--icon-size);
+  height: var(--icon-size);
 }
 
-button:hover {
-  border-color: var(--color-primary, #888);
-}
-
-button:active {
-  background-color: var(--color-muted, #f0f0f0);
-}
-
-.magicBtn,
-.workingMagic {
-  width: 80px;
-  height: 32px;
-}
-
-.workingMagic {
+.catSpinnerContainer {
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
 .spinner {
-  width: 18px;
-  height: 18px;
-  border: 2px solid #d8c7ff;
-  border-top-color: #7c4dff;
+  width: var(--icon-size);
+  height: var(--icon-size);
+  border: 3px solid var(--color-muted);
+  border-top-color: var(--color-text);
   border-radius: 50%;
   animation: spin 0.8s linear infinite;
 }
@@ -222,40 +212,6 @@ button:active {
   to {
     transform: rotate(360deg);
   }
-}
-
-.magicBtn {
-  background: linear-gradient(135deg, #f5f0ff, #ede4ff);
-  border-color: #d8c7ff;
-  font-weight: 500;
-}
-
-.removeBtn {
-  color: #b3261e;
-  border-color: #f2c9c6;
-  background: #fdf3f2;
-  font-size: 0.8rem;
-  padding: 0.3em 0.6em;
-}
-
-.removeBtn:hover {
-  background: #fbe4e2;
-  border-color: #e39a95;
-}
-
-/* Form */
-.formContainer {
-  border: 1px solid var(--color-border, #e0e0e0);
-  border-radius: var(--radius-sm, 8px);
-  padding: 0.6em;
-  background: var(--color-surface, #fafafa);
-  margin-bottom: 0.75rem;
-}
-
-.formContainer .fc p {
-  margin: 0 0 0.25em;
-  font-size: 0.78rem;
-  color: var(--color-text-muted, #666);
 }
 
 input {
@@ -272,44 +228,28 @@ input:focus {
   border-color: var(--color-primary, #888);
 }
 
-.endButtonContainer {
-  padding-top: 0.35em;
-  justify-content: end;
-}
-
-/* Shopping list */
 .categoryGroup {
   margin-bottom: 0.2rem;
 }
 
 .categoryHeader {
-  font-size: 0.7rem;
-  font-weight: 600;
+  font-size: var(--font-size-sm);
   text-transform: uppercase;
-  letter-spacing: 0.04em;
   color: var(--color-text-muted, #888);
-  padding-bottom: 0.2em;
+  padding-bottom: var(--space-xs);
+  margin: auto;
   border-bottom: 1px solid var(--color-border, #eee);
-  margin-bottom: 0.1em;
 }
 
 .listItem {
+  width: 90%;
+  margin: auto;
+  font-size: var(--font-size-sm);
+  display: flex;
+  flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  padding: 0.1em 0.1em;
-  border-bottom: 1px solid var(--color-border, #f0f0f0);
-}
-
-.listItem:last-child {
-  border-bottom: none;
-}
-
-.itemInfo {
-  width: 100%;
-}
-
-.itemInfo p {
-  margin: 0;
-  font-size: 0.9rem;
+  padding: var(--space-xs);
+  text-transform: capitalize;
 }
 </style>
