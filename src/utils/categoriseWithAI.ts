@@ -1,6 +1,6 @@
 import { GoogleGenAI } from "@google/genai";
 import Groq from "groq-sdk";
-import type { TItem } from '../types/TItem';
+import type { TItem } from '@/types/TItem';
 
 /**
  * Returns system prompt for categorisation, with user's chosen language inserted

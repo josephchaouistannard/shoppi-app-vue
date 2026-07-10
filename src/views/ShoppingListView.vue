@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import { useItemsStore } from '../stores/items'
-import type { TItem } from '../types/TItem';
+import { useItemsStore } from '@/stores/items'
+import type { TItem } from '@/types/TItem';
 import { useRouter } from 'vue-router';
-import { useSettingsStore } from '../stores/settings'
+import { useSettingsStore } from '@/stores/settings'
 import { categoriseWithAI } from '@/utils/categoriseWithAI';
 import { useToast } from '@/composables/toast'
 

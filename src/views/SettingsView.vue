@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from 'vue';
-import { useItemsStore } from '../stores/items'
-import { useSettingsStore } from '../stores/settings'
+import { useItemsStore } from '@/stores/items'
+import { useSettingsStore } from '@/stores/settings'
 import { useRouter } from 'vue-router';
 import { useToast } from '@/composables/toast'
 import { useConfirm } from "@/composables/confirm";

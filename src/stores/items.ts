@@ -1,7 +1,7 @@
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
-import type { TItem } from '../types/TItem'
-import { useSettingsStore } from './settings'
+import type { TItem } from '@/types/TItem'
+import { useSettingsStore } from '@/stores/settings'
 import { useToast } from '@/composables/toast'
 
 const toasts = useToast()
