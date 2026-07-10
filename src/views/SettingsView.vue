@@ -3,7 +3,9 @@ import { ref, onMounted } from 'vue';
 import { useItemsStore } from '../stores/items'
 import { useSettingsStore } from '../stores/settings'
 import { useRouter } from 'vue-router';
+import { useToast } from '@/composables/toast'
 
+const toasts = useToast()
 const settingsStore = useSettingsStore()
 const itemsStore = useItemsStore()
 const router = useRouter()
@@ -19,24 +21,42 @@ onMounted(() => {
 })
 
 function handleSaveUrl() {
-  settingsStore.setApiUrl(newUrl.value)
+  if (newUrl.value.trim() !== '') {
+    settingsStore.setApiUrl(newUrl.value)
+    toasts.addToast("URL saved", 'success')
+  }
 }
 function handleSaveToken() {
-  settingsStore.setApiToken(newToken.value)
+  if (newToken.value.trim() !== '') {
+    settingsStore.setApiToken(newToken.value)
+    toasts.addToast("Api key saved", 'success')
+  }
 }
 function handleSaveLangCat() {
-  settingsStore.setLangCategories(newLangCat.value)
+  if (newLangCat.value.trim() !== '') {
+    settingsStore.setLangCategories(newLangCat.value)
+    toasts.addToast("Category language saved", 'success')
+  }
 }
 function handleSaveProviderApiKey() {
   const name = settingsStore.activeProvider?.name
-  if (name) {
+  if (name && newProviderApiKey.value.trim() !== '') {
     settingsStore.updateProviderApiKey(name, newProviderApiKey.value)
+    newProviderApiKey.value = ''
+    toasts.addToast("API key saved", 'success')
   }
-  newProviderApiKey.value = ''
 }
 
 function handleSetActiveProvider(name: string) {
   settingsStore.setActiveProvider(name)
+}
+
+const handleSuccess = () => {
+  toasts.addToast('Action completed successfully!', 'success')
+}
+
+const handleCustomDuration = () => {
+  toasts.addToast('This toast stays for 5 seconds!', 'error', 5000)
 }
 
 </script>
@@ -105,6 +125,12 @@ function handleSetActiveProvider(name: string) {
 
     </div>
   </div>
+
+  <div>
+    <button @click="handleSuccess">Show Toast</button>
+    <button @click="handleCustomDuration">Show Long Toast</button>
+  </div>
+
 </template>
 
 <style scoped>
@@ -114,6 +140,7 @@ input[type="radio"] {
   cursor: pointer;
   width: 20px;
 }
+
 small {
   padding-top: var(--space-sm);
 }
