@@ -27,6 +27,13 @@ export const useSettingsStore = defineStore('settings', () => {
     localStorage.setItem(API_TOKEN_KEY, token)
   }
 
+  function resetSyncServer() {
+    apiUrl.value = '';
+    localStorage.setItem(API_URL_KEY, '');
+    apiToken.value = '';
+    localStorage.setItem(API_TOKEN_KEY, '')
+  }
+
   // LANGUAGE
   const langCategories = ref('');
   const LANG_CAT_KEY = "langCategories"
@@ -61,6 +68,15 @@ export const useSettingsStore = defineStore('settings', () => {
       return
     }
     provider.apiKey = key;
+    persistProviders()
+  }
+
+  function deleteProviderApiKey(name: string) {
+    const provider = providers.value.find((p) => p.name == name);
+    if (!provider) {
+      return
+    }
+    provider.apiKey = null;
     persistProviders()
   }
 
@@ -129,5 +145,7 @@ export const useSettingsStore = defineStore('settings', () => {
     activeProvider,
     setActiveProvider,
     updateProviderApiKey,
+    deleteProviderApiKey,
+    resetSyncServer,
   }
 })

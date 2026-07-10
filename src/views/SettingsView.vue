@@ -4,7 +4,9 @@ import { useItemsStore } from '../stores/items'
 import { useSettingsStore } from '../stores/settings'
 import { useRouter } from 'vue-router';
 import { useToast } from '@/composables/toast'
+import { useConfirm } from "@/composables/confirm";
 
+const { confirm } = useConfirm();
 const toasts = useToast()
 const settingsStore = useSettingsStore()
 const itemsStore = useItemsStore()
@@ -51,6 +53,34 @@ function handleSetActiveProvider(name: string) {
   settingsStore.setActiveProvider(name)
 }
 
+async function handleSyncServerReset() {
+  const ok = await confirm({
+    title: `Reset Sync Server`,
+    message: `The saved sync server URL and key will be deleted permanently.`,
+    confirmText: "Delete",
+    cancelText: "Cancel",
+  });
+
+  if (ok) {
+    settingsStore.resetSyncServer()
+    toasts.addToast("API key deleted", 'info')
+  }
+}
+
+async function handleProviderKeyReset(name: string) {
+  const ok = await confirm({
+    title: `Delete ${name} API key`,
+    message: `Your ${name} API key will be permanently deleted`,
+    confirmText: "Delete",
+    cancelText: "Cancel",
+  });
+
+  if (ok) {
+    settingsStore.deleteProviderApiKey(name)
+    toasts.addToast("API key deleted", 'info')
+  }
+}
+
 </script>
 
 <template>
@@ -69,12 +99,15 @@ function handleSetActiveProvider(name: string) {
         <button @click="handleSaveUrl">Save</button>
       </div>
       <div class="fc">
-        <p>API Token:</p>
+        <p>API Key:</p>
         <small v-if="settingsStore.apiToken">{{ settingsStore.apiToken }}</small>
         <input type="text" v-model="newToken" @keyup.enter="handleSaveToken" />
       </div>
       <div class="fr endButtonContainer">
         <button @click="handleSaveToken">Save</button>
+      </div>
+      <div class="fr endButtonContainer">
+        <button @click="handleSyncServerReset">Reset</button>
       </div>
     </div>
     <div class="formContainer">
@@ -100,8 +133,9 @@ function handleSetActiveProvider(name: string) {
           <label :for="provider.name" :key="provider.name">
             {{ provider.name }}
           </label>
-          <img v-if="provider.apiKey" src="../assets/key.svg" />
-          <img v-else src="../assets/keyOff.svg" />
+          <img class="savedKey" @click="handleProviderKeyReset(provider.name)" v-if="provider.apiKey"
+            src="../assets/key.svg" />
+          <img class="noKeySaved" v-else src="../assets/keyOff.svg" />
           <input type="radio" :id="provider.name" name="providerName" :value="provider.name"
             :checked="provider.name === settingsStore.activeProvider?.name"
             @change="handleSetActiveProvider(provider.name)">
@@ -129,6 +163,22 @@ input[type="radio"] {
 small,
 p {
   padding-top: var(--space-xs);
+}
+
+.savedKey {
+  transition: 0.1s all ease-in-out;
+}
+
+.savedKey:hover {
+  cursor: pointer
+}
+
+.savedKey:active {
+  transform: scale(1.5);
+}
+
+.noKeySaved {
+  opacity: 0;
 }
 
 .providerRadio {

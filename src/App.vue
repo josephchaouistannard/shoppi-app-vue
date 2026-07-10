@@ -4,6 +4,7 @@ import { onMounted } from 'vue';
 import { useItemsStore } from './stores/items'
 import { useSettingsStore } from './stores/settings'
 import ToastContainer from './components/ToastContainer.vue';
+import ConfirmDiaglog from './components/ConfirmDiaglog.vue';
 
 
 const settingsStore = useSettingsStore()
@@ -17,7 +18,8 @@ onMounted(() => {
 
 <template>
   <RouterView />
-  <ToastContainer/>
+  <ToastContainer />
+  <ConfirmDiaglog />
 </template>
 
 <style scoped></style>
