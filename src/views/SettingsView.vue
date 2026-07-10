@@ -100,14 +100,14 @@ function handleSetActiveProvider(name: string) {
           <label :for="provider.name" :key="provider.name">
             {{ provider.name }}
           </label>
+          <img v-if="provider.apiKey" src="../assets/key.svg" />
+          <img v-else src="../assets/keyOff.svg" />
           <input type="radio" :id="provider.name" name="providerName" :value="provider.name"
             :checked="provider.name === settingsStore.activeProvider?.name"
             @change="handleSetActiveProvider(provider.name)">
         </div>
         <div v-if="settingsStore.activeProvider">
           <p>Set API key for {{ settingsStore.activeProvider.name }}:</p>
-          <small v-if="settingsStore.activeProvider.apiKey">Key set!</small>
-          <small v-else>No key set</small>
           <input type="text" v-model="newProviderApiKey" @keyup.enter="handleSaveProviderApiKey" />
           <div class="fr endButtonContainer">
             <button @click="handleSaveProviderApiKey">Save</button>
@@ -126,18 +126,23 @@ input[type="radio"] {
   width: 20px;
 }
 
-small {
-  padding-top: var(--space-sm);
+small,
+p {
+  padding-top: var(--space-xs);
 }
 
 .providerRadio {
   margin: auto;
-  display: flex;
-  width: 90%;
-  flex-direction: row;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: 1fr 70px 50px;
   align-items: center;
-  padding: var(--space-xs) var(--space-md)
+  width: 90%;
+  padding: var(--space-xs) var(--space-md);
+}
+
+.providerRadio img,
+.providerRadio input[type="radio"] {
+  justify-self: center;
 }
 
 h4 {
