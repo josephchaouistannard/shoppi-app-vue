@@ -5,6 +5,11 @@ import { useSettingsStore } from '@/stores/settings'
 import { useRouter } from 'vue-router'
 import { useToast } from '@/composables/toast'
 import { useConfirm } from '@/composables/confirm'
+import QRCode from 'qrcode'
+import {
+  CapacitorBarcodeScanner,
+  CapacitorBarcodeScannerTypeHint
+} from '@capacitor/barcode-scanner';
 
 const { confirm } = useConfirm()
 const toasts = useToast()
@@ -16,6 +21,7 @@ const newUrl = ref('')
 const newToken = ref('')
 const newLangCat = ref('')
 const newProviderApiKey = ref('')
+const qrCodeUrl = ref('');
 
 onMounted(() => {
   settingsStore.initialise()
@@ -80,12 +86,55 @@ async function handleProviderKeyReset(name: string) {
     toasts.addToast('API key deleted', 'info')
   }
 }
+
+async function generateQR() {
+  const settingsData = settingsStore.$state;
+  const jsonString = JSON.stringify(settingsData);
+  const base64Data = btoa(encodeURIComponent(jsonString));
+
+  try {
+    qrCodeUrl.value = await QRCode.toDataURL(base64Data, {
+      errorCorrectionLevel: 'M',
+      margin: 2
+    });
+  } catch (err) {
+    toasts.addToast('Failed to generate QR code', 'error')
+    console.error('Failed to generate QR Code', err);
+  }
+}
+
+async function scanQR() {
+  try {
+    const result = await CapacitorBarcodeScanner.scanBarcode({
+      hint: CapacitorBarcodeScannerTypeHint.QR_CODE
+    });
+
+    if (result && result.ScanResult) {
+      const decodedJsonString = decodeURIComponent(atob(result.ScanResult));
+      const importedSettings = JSON.parse(decodedJsonString);
+
+      settingsStore.$state = importedSettings
+
+      toasts.addToast('Setting imported', 'success')
+    }
+  } catch (error) {
+    console.error('Scan failed', error);
+    toasts.addToast('Failed to scan QR code', 'error')
+  }
+};
+
+function closeModal() {
+  qrCodeUrl.value = ''
+}
+
 </script>
 
 <template>
   <div class="viewContainer">
     <header>
       <img class="backBtn" src="../assets/backarrow.svg" @click="router.back()" />
+      <img class="shareBtn" src="../assets/share.svg" @click="generateQR" />
+      <img class="shareBtn" src="../assets/qr.svg" @click="scanQR" />
     </header>
     <section>
       <h4>Sync Server</h4>
@@ -123,35 +172,28 @@ async function handleProviderKeyReset(name: string) {
           <label :for="provider.name" :key="provider.name">
             {{ provider.name }}
           </label>
-          <img
-            class="savedKey"
-            @click="handleProviderKeyReset(provider.name)"
-            v-if="provider.apiKey"
-            src="../assets/key.svg"
-          />
+          <img class="savedKey" @click="handleProviderKeyReset(provider.name)" v-if="provider.apiKey"
+            src="../assets/key.svg" />
           <img class="noKeySaved" v-else src="../assets/keyOff.svg" />
-          <input
-            type="radio"
-            :id="provider.name"
-            name="providerName"
-            :value="provider.name"
+          <input type="radio" :id="provider.name" name="providerName" :value="provider.name"
             :checked="provider.name === settingsStore.activeProvider?.name"
-            @change="handleSetActiveProvider(provider.name)"
-          />
+            @change="handleSetActiveProvider(provider.name)" />
         </div>
         <div v-if="settingsStore.activeProvider">
           <small>Set API key for {{ settingsStore.activeProvider.name }}:</small>
           <div class="textInputContainer">
-            <input
-              type="text"
-              v-model="newProviderApiKey"
-              @keyup.enter="handleSaveProviderApiKey"
-            />
+            <input type="text" v-model="newProviderApiKey" @keyup.enter="handleSaveProviderApiKey" />
             <img class="saveBtn" src="../assets/save.svg" @click="handleSaveProviderApiKey" />
           </div>
         </div>
       </div>
     </section>
+  </div>
+  <div v-if="qrCodeUrl" class="modal-backdrop" @click.self="closeModal">
+    <div class="qr-modal">
+      <button class="close-button" @click="closeModal">&times;</button>
+      <img :src="qrCodeUrl" alt="Settings QR Code" />
+    </div>
   </div>
 </template>
 
@@ -261,5 +303,39 @@ input:focus {
   flex-direction: row;
   align-items: center;
   gap: var(--space-md);
+}
+
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0, 0, 0, 0.6);
+}
+
+.qr-modal {
+  position: relative;
+  padding: 24px;
+  background: var(--color-bg);
+  border-radius: 12px;
+  text-align: center;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25);
+}
+
+.qr-modal img {
+  display: block;
+  margin-top: 16px;
+}
+
+.close-button {
+  position: absolute;
+  top: 8px;
+  right: 12px;
+  border: 0;
+  background: none;
+  font-size: 24px;
+  cursor: pointer;
 }
 </style>
