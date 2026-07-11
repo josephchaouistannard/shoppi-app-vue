@@ -13,11 +13,11 @@ const { visible, options, close } = useConfirm();
         <p>{{ options.message }}</p>
 
         <div class="actions">
-          <button @click="close(false)">
+          <button class="cancel" @click="close(false)">
             {{ options.cancelText }}
           </button>
 
-          <button @click="close(true)">
+          <button class="confirm" @click="close(true)">
             {{ options.confirmText }}
           </button>
         </div>
@@ -30,23 +30,18 @@ const { visible, options, close } = useConfirm();
 .overlay {
   position: fixed;
   inset: 0;
-
   display: flex;
   align-items: center;
   justify-content: center;
-
   background: rgba(0, 0, 0, 0.4);
   z-index: 1000;
 }
 
 .dialog {
-  width: min(90vw, 400px);
-
-  padding: 1.5rem;
-
-  background: white;
+  width: min(90vw, 300px);
+  padding: 1rem;
+  background: var(--color-bg);
   border-radius: 8px;
-
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
 }
 
@@ -66,10 +61,16 @@ const { visible, options, close } = useConfirm();
 
 .actions button {
   padding: 0.5rem 1rem;
-
   border: 0;
   border-radius: 6px;
-
   cursor: pointer;
+}
+
+.confirm {
+  color: var(--color-primary);
+}
+
+.cancel {
+  color: var(--color-muted);
 }
 </style>

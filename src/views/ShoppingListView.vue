@@ -78,7 +78,6 @@ async function handleCategorisation() {
 function handleRemove(id: string) {
   itemsStore.removeItem(id)
 }
-
 </script>
 
 <template>

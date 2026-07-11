@@ -6,13 +6,7 @@ const { toasts, removeToast } = useToast()
 
 <template>
   <div class="toast-container">
-    <div
-      v-for="toast in toasts"
-      :key="toast.id"
-      class="toast"
-      :class="toast.type"
-      @click="removeToast(toast.id)"
-    >
+    <div v-for="toast in toasts" :key="toast.id" class="toast" :class="toast.type" @click="removeToast(toast.id)">
       {{ toast.message }}
     </div>
   </div>
@@ -22,36 +16,40 @@ const { toasts, removeToast } = useToast()
 /* Positions the toasts at the top-center of the screen */
 .toast-container {
   position: fixed;
-  top: 20px;
+  bottom: 20px;
   left: 50%;
   transform: translateX(-50%);
   z-index: 9999;
   display: flex;
   flex-direction: column;
-  gap: 10px;
-  pointer-events: none; /* Allows clicking elements behind the empty space */
+  gap: var(--space-sm);
+  pointer-events: none;
 }
 
-/* Minimal styling so they are visible and interactive */
 .toast {
-  pointer-events: auto; /* Re-enables clicking on the toast itself to dismiss */
-  background-color: #333;
+  pointer-events: auto;
   color: #fff;
-  padding: 10px 20px;
+  padding: var(--space-xs) var(--space-md);
   border-radius: 4px;
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  opacity: 0.95;
+  text-align: center;
 }
 
 .success {
-  background-color: #5cb87a; /* Green */
+  background-color: var(--color-good);
 }
 
 .error {
-  background-color: #d9534f; /* Red */
+  background-color: var(--color-bad);
 }
 
 .warn {
-  background-color: #d28c15; /* Red */
+  background-color: var(--color-warn);
+}
+
+.info {
+  background-color: var(--color-muted);
 }
 </style>
