@@ -119,7 +119,7 @@ async function handleProviderKeyReset(name: string) {
       <div class="fc">
         <h4>AI Categorisation</h4>
         <small>Choose active provider:</small>
-        <div class="providerRadio" v-for="provider in settingsStore.providers">
+        <div class="providerRadio" v-for="provider in settingsStore.providers" :key="provider.name">
           <label :for="provider.name" :key="provider.name">
             {{ provider.name }}
           </label>

@@ -120,7 +120,7 @@ function handleRemove(id: string) {
       </div>
     </section>
     <section class="shoppingList">
-      <div v-for="cat in itemsStore.categories" class="categoryGroup">
+      <div v-for="cat in itemsStore.categories" :key="cat ?? 'autres'" class="categoryGroup">
         <div class="categoryHeader">
           <strong>
             {{ cat ?? 'Sans Categorie' }}
