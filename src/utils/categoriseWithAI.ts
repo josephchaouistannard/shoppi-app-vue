@@ -1,6 +1,6 @@
-import { GoogleGenAI } from "@google/genai";
-import Groq from "groq-sdk";
-import type { TItem } from '@/types/TItem';
+import { GoogleGenAI } from '@google/genai'
+import Groq from 'groq-sdk'
+import type { TItem } from '@/types/TItem'
 
 /**
  * Returns system prompt for categorisation, with user's chosen language inserted
@@ -111,7 +111,7 @@ Example output (Assuming the laguage choses by the user for the categories is En
     "isDeleted": false
   }
 ]
-`;
+`
 }
 
 /**
@@ -122,23 +122,26 @@ Example output (Assuming the laguage choses by the user for the categories is En
  * @param langCategories
  * @returns Full JSON list with categories
  */
-export async function categoriseWithAI(providerName: string, items: TItem[], apiKey: string, langCategories: string) {
-  const systemPrompt = getSystemPrompt(langCategories);
+export async function categoriseWithAI(
+  providerName: string,
+  items: TItem[],
+  apiKey: string,
+  langCategories: string,
+) {
+  const systemPrompt = getSystemPrompt(langCategories)
   try {
-
     switch (providerName) {
-      case "Gemini":
-        return await categoriseWithGemini(items, apiKey, systemPrompt);
+      case 'Gemini':
+        return await categoriseWithGemini(items, apiKey, systemPrompt)
 
-      case "Groq":
-        return await categoriseWithGroq(items, apiKey, systemPrompt);
+      case 'Groq':
+        return await categoriseWithGroq(items, apiKey, systemPrompt)
     }
   } catch (error) {
-    console.error("Error categorising with AI", error)
+    console.error('Error categorising with AI', error)
     throw error
   }
 }
-
 
 /**
  * Makes request to gemini API to categorise the items, according to user language
@@ -149,30 +152,30 @@ export async function categoriseWithAI(providerName: string, items: TItem[], api
  */
 async function categoriseWithGemini(items: TItem[], apiKey: string, systemPrompt: string) {
   if (!apiKey) {
-    console.warn("Gemini API key is required.");
-    return null;
+    console.warn('Gemini API key is required.')
+    return null
   }
 
-  const ai = new GoogleGenAI({ apiKey });
+  const ai = new GoogleGenAI({ apiKey })
 
-  const userPrompt = JSON.stringify({ items });
+  const userPrompt = JSON.stringify({ items })
 
   try {
     const response = await ai.models.generateContent({
-      model: "gemini-2.5-flash-lite",
+      model: 'gemini-2.5-flash-lite',
       config: {
         systemInstruction: systemPrompt,
       },
       contents: userPrompt,
-    });
+    })
 
     if (response.text) {
-      return JSON.parse(response.text);
+      return JSON.parse(response.text)
     }
-    return null;
+    return null
   } catch (err) {
-    console.error("Gemini call failed:", err);
-    return null;
+    console.error('Gemini call failed:', err)
+    return null
   }
 }
 
@@ -185,38 +188,38 @@ async function categoriseWithGemini(items: TItem[], apiKey: string, systemPrompt
  */
 async function categoriseWithGroq(items: TItem[], apiKey: string, systemPrompt: string) {
   if (!apiKey) {
-    console.warn("Groq API key is required.");
-    return null;
+    console.warn('Groq API key is required.')
+    return null
   }
 
-  const groq = new Groq({ apiKey: apiKey, dangerouslyAllowBrowser: true });
+  const groq = new Groq({ apiKey: apiKey, dangerouslyAllowBrowser: true })
 
-  const userPrompt = JSON.stringify({ items });
+  const userPrompt = JSON.stringify({ items })
 
   try {
     const chatCompletion = await groq.chat.completions.create({
       messages: [
         {
-          role: "system",
+          role: 'system',
           content: systemPrompt,
         },
         {
-          role: "user",
+          role: 'user',
           content: userPrompt,
         },
       ],
-      model: "llama-3.3-70b-versatile",
-      response_format: { type: "json_object" },
-    });
+      model: 'llama-3.3-70b-versatile',
+      response_format: { type: 'json_object' },
+    })
 
-    const responseText = chatCompletion.choices[0]?.message?.content;
+    const responseText = chatCompletion.choices[0]?.message?.content
 
     if (responseText) {
-      return JSON.parse(responseText);
+      return JSON.parse(responseText)
     }
-    return null;
+    return null
   } catch (err) {
-    console.error("Groq call failed:", err);
-    return null;
+    console.error('Groq call failed:', err)
+    return null
   }
 }

@@ -1,10 +1,10 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted } from 'vue'
 import { useItemsStore } from '@/stores/items'
-import type { TItem } from '@/types/TItem';
-import { useRouter } from 'vue-router';
+import type { TItem } from '@/types/TItem'
+import { useRouter } from 'vue-router'
 import { useSettingsStore } from '@/stores/settings'
-import { categoriseWithAI } from '@/utils/categoriseWithAI';
+import { categoriseWithAI } from '@/utils/categoriseWithAI'
 import { useToast } from '@/composables/toast'
 
 const toasts = useToast()
@@ -14,7 +14,6 @@ const router = useRouter()
 
 const newItemName = ref('')
 const categorisationInProgress = ref(false)
-
 
 onMounted(() => {
   if (!settingsStore.missingApiSettings) {
@@ -34,7 +33,7 @@ function handleAddItem() {
     return
   }
   itemsStore.addItem(newItemName.value)
-  newItemName.value = ""
+  newItemName.value = ''
 }
 
 async function handleCategorisation() {
@@ -57,8 +56,13 @@ async function handleCategorisation() {
 
   categorisationInProgress.value = true
   try {
-    const response = await categoriseWithAI(activeProvider.name, itemsStore.items, activeProvider.apiKey, settingsStore.langCategories)
-    categorisationInProgress.value = false;
+    const response = await categoriseWithAI(
+      activeProvider.name,
+      itemsStore.items,
+      activeProvider.apiKey,
+      settingsStore.langCategories,
+    )
+    categorisationInProgress.value = false
 
     if (response['items']) {
       response['items'].forEach((item: TItem) => {
@@ -72,7 +76,6 @@ async function handleCategorisation() {
     toasts.addToast('Something went wrong', 'error')
     console.error('Categorisation error', err)
   }
-
 }
 
 function handleRemove(id: string) {
@@ -85,12 +88,24 @@ function handleRemove(id: string) {
     <header>
       <h2>Shoppi</h2>
       <div class="syncIndicator">
-        <img class="syncInProgress" src="../assets/syncInProgress.svg" v-if="itemsStore.isSyncing" />
-        <img class="syncSuccess" src="../assets/syncSuccess.svg" v-else-if="itemsStore.justSynced" />
+        <img
+          class="syncInProgress"
+          src="../assets/syncInProgress.svg"
+          v-if="itemsStore.isSyncing"
+        />
+        <img
+          class="syncSuccess"
+          src="../assets/syncSuccess.svg"
+          v-else-if="itemsStore.justSynced"
+        />
         <img class="syncError" src="../assets/syncError.svg" v-else-if="itemsStore.syncError" />
       </div>
-      <img v-if="!categorisationInProgress" src="../assets/categories.svg" class="catBtn"
-        @click="handleCategorisation" />
+      <img
+        v-if="!categorisationInProgress"
+        src="../assets/categories.svg"
+        class="catBtn"
+        @click="handleCategorisation"
+      />
       <div v-else class="catSpinnerContainer">
         <div class="spinner"></div>
       </div>
@@ -108,7 +123,7 @@ function handleRemove(id: string) {
       <div v-for="cat in itemsStore.categories" class="categoryGroup">
         <div class="categoryHeader">
           <strong>
-            {{ cat ?? "Sans Categorie" }}
+            {{ cat ?? 'Sans Categorie' }}
           </strong>
         </div>
         <div v-for="item in itemsStore.itemsByCategory(cat)" :key="item.id">
@@ -137,7 +152,10 @@ function handleRemove(id: string) {
   max-width: 420px;
   margin: 1rem auto;
   padding: 0 0.75rem;
-  font-family: system-ui, -apple-system, sans-serif;
+  font-family:
+    system-ui,
+    -apple-system,
+    sans-serif;
   color: var(--color-text, #1a1a1a);
 }
 

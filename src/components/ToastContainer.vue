@@ -6,7 +6,13 @@ const { toasts, removeToast } = useToast()
 
 <template>
   <div class="toast-container">
-    <div v-for="toast in toasts" :key="toast.id" class="toast" :class="toast.type" @click="removeToast(toast.id)">
+    <div
+      v-for="toast in toasts"
+      :key="toast.id"
+      class="toast"
+      :class="toast.type"
+      @click="removeToast(toast.id)"
+    >
       {{ toast.message }}
     </div>
   </div>

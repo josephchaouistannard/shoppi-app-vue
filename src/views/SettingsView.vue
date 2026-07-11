@@ -1,12 +1,12 @@
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
+import { ref, onMounted } from 'vue'
 import { useItemsStore } from '@/stores/items'
 import { useSettingsStore } from '@/stores/settings'
-import { useRouter } from 'vue-router';
+import { useRouter } from 'vue-router'
 import { useToast } from '@/composables/toast'
-import { useConfirm } from "@/composables/confirm";
+import { useConfirm } from '@/composables/confirm'
 
-const { confirm } = useConfirm();
+const { confirm } = useConfirm()
 const toasts = useToast()
 const settingsStore = useSettingsStore()
 const itemsStore = useItemsStore()
@@ -25,19 +25,19 @@ onMounted(() => {
 function handleSaveUrl() {
   if (newUrl.value.trim() !== '') {
     settingsStore.setApiUrl(newUrl.value)
-    toasts.addToast("URL saved", 'success')
+    toasts.addToast('URL saved', 'success')
   }
 }
 function handleSaveToken() {
   if (newToken.value.trim() !== '') {
     settingsStore.setApiToken(newToken.value)
-    toasts.addToast("Api key saved", 'success')
+    toasts.addToast('Api key saved', 'success')
   }
 }
 function handleSaveLangCat() {
   if (newLangCat.value.trim() !== '') {
     settingsStore.setLangCategories(newLangCat.value)
-    toasts.addToast("Category language saved", 'success')
+    toasts.addToast('Category language saved', 'success')
   }
 }
 function handleSaveProviderApiKey() {
@@ -45,7 +45,7 @@ function handleSaveProviderApiKey() {
   if (name && newProviderApiKey.value.trim() !== '') {
     settingsStore.updateProviderApiKey(name, newProviderApiKey.value)
     newProviderApiKey.value = ''
-    toasts.addToast("API key saved", 'success')
+    toasts.addToast('API key saved', 'success')
   }
 }
 
@@ -57,13 +57,13 @@ async function handleSyncServerReset() {
   const ok = await confirm({
     title: `Reset Sync Server`,
     message: `The saved sync server URL and key will be deleted permanently.`,
-    confirmText: "Delete",
-    cancelText: "Cancel",
-  });
+    confirmText: 'Delete',
+    cancelText: 'Cancel',
+  })
 
   if (ok) {
     settingsStore.resetSyncServer()
-    toasts.addToast("API key deleted", 'info')
+    toasts.addToast('API key deleted', 'info')
   }
 }
 
@@ -71,16 +71,15 @@ async function handleProviderKeyReset(name: string) {
   const ok = await confirm({
     title: `Delete ${name} API key`,
     message: `Your ${name} API key will be permanently deleted`,
-    confirmText: "Delete",
-    cancelText: "Cancel",
-  });
+    confirmText: 'Delete',
+    cancelText: 'Cancel',
+  })
 
   if (ok) {
     settingsStore.deleteProviderApiKey(name)
-    toasts.addToast("API key deleted", 'info')
+    toasts.addToast('API key deleted', 'info')
   }
 }
-
 </script>
 
 <template>
@@ -93,7 +92,6 @@ async function handleProviderKeyReset(name: string) {
       <small>API URL:</small>
       <small v-if="settingsStore.apiUrl">{{ settingsStore.apiUrl }}</small>
       <div class="textInputContainer">
-
         <input type="text" v-model="newUrl" @keyup.enter="handleSaveUrl" />
         <img class="saveBtn" src="../assets/save.svg" @click="handleSaveUrl" />
       </div>
@@ -117,8 +115,6 @@ async function handleProviderKeyReset(name: string) {
       </div>
     </section>
 
-
-
     <section>
       <div class="fc">
         <h4>AI Categorisation</h4>
@@ -127,17 +123,30 @@ async function handleProviderKeyReset(name: string) {
           <label :for="provider.name" :key="provider.name">
             {{ provider.name }}
           </label>
-          <img class="savedKey" @click="handleProviderKeyReset(provider.name)" v-if="provider.apiKey"
-            src="../assets/key.svg" />
+          <img
+            class="savedKey"
+            @click="handleProviderKeyReset(provider.name)"
+            v-if="provider.apiKey"
+            src="../assets/key.svg"
+          />
           <img class="noKeySaved" v-else src="../assets/keyOff.svg" />
-          <input type="radio" :id="provider.name" name="providerName" :value="provider.name"
+          <input
+            type="radio"
+            :id="provider.name"
+            name="providerName"
+            :value="provider.name"
             :checked="provider.name === settingsStore.activeProvider?.name"
-            @change="handleSetActiveProvider(provider.name)">
+            @change="handleSetActiveProvider(provider.name)"
+          />
         </div>
         <div v-if="settingsStore.activeProvider">
           <small>Set API key for {{ settingsStore.activeProvider.name }}:</small>
           <div class="textInputContainer">
-            <input type="text" v-model="newProviderApiKey" @keyup.enter="handleSaveProviderApiKey" />
+            <input
+              type="text"
+              v-model="newProviderApiKey"
+              @keyup.enter="handleSaveProviderApiKey"
+            />
             <img class="saveBtn" src="../assets/save.svg" @click="handleSaveProviderApiKey" />
           </div>
         </div>
@@ -165,7 +174,7 @@ async function handleProviderKeyReset(name: string) {
   opacity: 0;
 }
 
-input[type="radio"] {
+input[type='radio'] {
   appearance: auto;
   -webkit-appearance: radio;
   cursor: pointer;
@@ -186,7 +195,7 @@ p {
 }
 
 .providerRadio img,
-.providerRadio input[type="radio"] {
+.providerRadio input[type='radio'] {
   justify-self: center;
 }
 
@@ -199,7 +208,10 @@ h4 {
   max-width: 420px;
   margin: 1rem auto;
   padding: 0 0.75rem;
-  font-family: system-ui, -apple-system, sans-serif;
+  font-family:
+    system-ui,
+    -apple-system,
+    sans-serif;
   color: var(--color-text, #1a1a1a);
 }
 
@@ -220,7 +232,7 @@ header h2 {
 
 section {
   padding: 0.5rem;
-  border-bottom: 2px var(--color-border) solid
+  border-bottom: 2px var(--color-border) solid;
 }
 
 input {

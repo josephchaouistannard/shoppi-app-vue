@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { useConfirm } from "@/composables/confirm";
+import { useConfirm } from '@/composables/confirm'
 
-const { visible, options, close } = useConfirm();
+const { visible, options, close } = useConfirm()
 </script>
 
 <template>

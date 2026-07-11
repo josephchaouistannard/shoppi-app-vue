@@ -11,23 +11,18 @@ export const useItemsStore = defineStore('items', () => {
 
   // ITEMS
   const items = ref<TItem[]>([])
-  const ITEMS_KEY = "items"
+  const ITEMS_KEY = 'items'
   const count = computed(() => items.value.length)
-  const categoriesNotDeleted = computed(() =>
-    [...new Set(
-      items.value
-        .filter(item => !item.isDeleted)
-        .map(item => item.category)
-    )]
-  )
+  const categoriesNotDeleted = computed(() => [
+    ...new Set(items.value.filter((item) => !item.isDeleted).map((item) => item.category)),
+  ])
   const itemsByCategoryNotDeleted = computed(() => {
     return (cat: string | null) =>
-      items.value.filter(item => item.category === cat && !item.isDeleted)
+      items.value.filter((item) => item.category === cat && !item.isDeleted)
   })
 
-
   // SYNC
-  const LAST_SYNCED_KEY = "lastSyncedAt"
+  const LAST_SYNCED_KEY = 'lastSyncedAt'
   const lastSyncedAt = ref<string | null>(localStorage.getItem(LAST_SYNCED_KEY))
   const isSyncing = ref(false)
   const justSynced = ref(false)
@@ -63,7 +58,7 @@ export const useItemsStore = defineStore('items', () => {
       category: null,
       updatedAt: new Date().toISOString(),
       syncedAt: null,
-      isDeleted: false
+      isDeleted: false,
     }
     items.value.push(item)
     persistItems()
@@ -71,7 +66,7 @@ export const useItemsStore = defineStore('items', () => {
   }
 
   function removeItem(id: string) {
-    const item = items.value.find(item => item.id === id)
+    const item = items.value.find((item) => item.id === id)
     if (item) {
       item.isDeleted = true
       item.updatedAt = new Date().toISOString()
@@ -81,7 +76,7 @@ export const useItemsStore = defineStore('items', () => {
   }
 
   function updateCategory(id: string, cat: string | null) {
-    const item = items.value.find(item => item.id === id)
+    const item = items.value.find((item) => item.id === id)
 
     if (!item) return
 
@@ -115,9 +110,9 @@ export const useItemsStore = defineStore('items', () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${settingsStore.apiToken}`
+          Authorization: `Bearer ${settingsStore.apiToken}`,
         },
-        body: JSON.stringify({ items: items.value }) // Send full list
+        body: JSON.stringify({ items: items.value }), // Send full list
       })
 
       if (!response.ok) {
@@ -135,7 +130,7 @@ export const useItemsStore = defineStore('items', () => {
         justSynced.value = true
         setTimeout(() => {
           justSynced.value = false
-        }, 2000);
+        }, 2000)
       }
     } catch (error) {
       syncError.value = true
@@ -158,8 +153,6 @@ export const useItemsStore = defineStore('items', () => {
     }, 3000)
   }
 
-
-
   return {
     items,
     count,
@@ -175,6 +168,6 @@ export const useItemsStore = defineStore('items', () => {
     justSynced,
     syncWithServer,
     triggerDebouncedSync,
-    syncError
+    syncError,
   }
 })

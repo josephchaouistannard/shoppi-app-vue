@@ -1,5 +1,5 @@
 export type TProvider = {
-  name: string,
+  name: string
   apiKey: string | null
   active: boolean
 }
