@@ -19,13 +19,6 @@ onMounted(() => {
   if (!settingsStore.missingApiSettings) {
     itemsStore.triggerDebouncedSync()
   }
-
-  // Works on web but not on android
-  window.addEventListener('focus', () => {
-    if (!settingsStore.missingApiSettings) {
-      itemsStore.triggerDebouncedSync()
-    }
-  })
 })
 
 function handleAddItem() {

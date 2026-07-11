@@ -5,6 +5,9 @@ import { useItemsStore } from '@/stores/items'
 import { useSettingsStore } from '@/stores/settings'
 import ToastContainer from '@/components/ToastContainer.vue'
 import ConfirmDiaglog from '@/components/ConfirmDiaglog.vue'
+import { App } from '@capacitor/app';
+
+
 
 const settingsStore = useSettingsStore()
 const itemsStore = useItemsStore()
@@ -12,6 +15,11 @@ const itemsStore = useItemsStore()
 onMounted(() => {
   settingsStore.initialise()
   itemsStore.initialise()
+  App.addListener('appStateChange', ({ isActive }) => {
+    if (!settingsStore.missingApiSettings) {
+      itemsStore.triggerDebouncedSync()
+    };
+  });
 })
 </script>
 
