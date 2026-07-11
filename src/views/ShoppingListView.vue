@@ -19,8 +19,6 @@ const categorisationInProgress = ref(false)
 onMounted(() => {
   if (!settingsStore.missingApiSettings) {
     itemsStore.triggerDebouncedSync()
-  } else {
-    toasts.addToast('Sync server not configured', 'info')
   }
 
   // Works on web but not on android

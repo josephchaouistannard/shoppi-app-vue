@@ -102,8 +102,7 @@ export const useItemsStore = defineStore('items', () => {
   async function syncWithServer() {
     if (isSyncing.value) return
 
-    if (!settingsStore.apiUrl || !settingsStore.apiToken) {
-      toasts.addToast('Sync server settings configured', 'error')
+    if (settingsStore.missingApiSettings) {
       return
     }
 
@@ -156,7 +155,7 @@ export const useItemsStore = defineStore('items', () => {
     clearTimeout(syncTimeout)
     syncTimeout = setTimeout(() => {
       syncWithServer()
-    }, 5000)
+    }, 3000)
   }
 
 
