@@ -6,6 +6,7 @@ import { useRouter } from 'vue-router'
 import { useSettingsStore } from '@/stores/settings'
 import { categoriseWithAI } from '@/utils/categoriseWithAI'
 import { useToast } from '@/composables/toast'
+import { Share } from '@capacitor/share'
 
 const toasts = useToast()
 const settingsStore = useSettingsStore()
@@ -20,6 +21,26 @@ onMounted(() => {
     itemsStore.triggerDebouncedSync()
   }
 })
+
+async function shareList() {
+  const list = itemsStore.categories
+    .map((cat) => {
+      const categoryName = cat ?? 'Sans Categorie'
+      const items = itemsStore.itemsByCategory(cat)
+
+      const itemLines = items
+        .map((item) => `   ${item.name}`)
+        .join('\n')
+
+      return `${categoryName}\n${itemLines}`
+    })
+    .join('\n\n')
+  await Share.share({
+    dialogTitle: 'Share Shoppi List',
+    title: 'Shoppi List',
+    text: list,
+  });
+}
 
 function handleAddItem() {
   if (newItemName.value.trim() === '') {
@@ -81,24 +102,13 @@ function handleRemove(id: string) {
     <header>
       <h2>Shoppi</h2>
       <div class="syncIndicator">
-        <img
-          class="syncInProgress"
-          src="../assets/syncInProgress.svg"
-          v-if="itemsStore.isSyncing"
-        />
-        <img
-          class="syncSuccess"
-          src="../assets/syncSuccess.svg"
-          v-else-if="itemsStore.justSynced"
-        />
+        <img class="syncInProgress" src="../assets/syncInProgress.svg" v-if="itemsStore.isSyncing" />
+        <img class="syncSuccess" src="../assets/syncSuccess.svg" v-else-if="itemsStore.justSynced" />
         <img class="syncError" src="../assets/syncError.svg" v-else-if="itemsStore.syncError" />
       </div>
-      <img
-        v-if="!categorisationInProgress"
-        src="../assets/categories.svg"
-        class="catBtn"
-        @click="handleCategorisation"
-      />
+      <img src="../assets/share.svg" class="shareBtn" @click="shareList" />
+      <img v-if="!categorisationInProgress" src="../assets/categories.svg" class="catBtn"
+        @click="handleCategorisation" />
       <div v-else class="catSpinnerContainer">
         <div class="spinner"></div>
       </div>
@@ -167,7 +177,8 @@ function handleRemove(id: string) {
 .addBtn,
 .removeBtn,
 .catBtn,
-.settingsBtn {
+.settingsBtn,
+.shareBtn {
   width: var(--icon-size);
   height: var(--icon-size);
   transition: 0.2s all ease-in-out;
@@ -176,7 +187,8 @@ function handleRemove(id: string) {
 .addBtn:active,
 .removeBtn:active,
 .catBtn:active,
-.settingsBtn:active {
+.settingsBtn:active,
+.shareBtn:active {
   transform: scale(1.2);
 }
 

@@ -17,7 +17,7 @@ onMounted(() => {
   itemsStore.initialise()
   App.addListener('appStateChange', ({ isActive }) => {
     if (!settingsStore.missingApiSettings) {
-      itemsStore.triggerDebouncedSync()
+      itemsStore.syncWithServer()
     };
   });
 })
