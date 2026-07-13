@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { RouterView } from 'vue-router'
+import { RouterView, useRoute, useRouter } from 'vue-router'
 import { onMounted } from 'vue'
 import { useItemsStore } from '@/stores/items'
 import { useSettingsStore } from '@/stores/settings'
@@ -8,7 +8,8 @@ import ConfirmDiaglog from '@/components/ConfirmDiaglog.vue'
 import { App } from '@capacitor/app';
 
 
-
+const route = useRoute()
+const router = useRouter()
 const settingsStore = useSettingsStore()
 const itemsStore = useItemsStore()
 
@@ -20,6 +21,13 @@ onMounted(() => {
       itemsStore.syncWithServer()
     };
   });
+  App.addListener('backButton', () => {
+    if (route.path == '/settings') {
+      router.back()
+    } else {
+      App.exitApp()
+    }
+  })
 })
 </script>
 
