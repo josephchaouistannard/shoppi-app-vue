@@ -1,54 +1,37 @@
-# shopping-list-app-vue
+# Shoppi
 
-This template should help get you started developing with Vue 3 in Vite.
+Shoppi is a local-first shopping list app for Android. Simple to use, it has an optional AI categorisation feature to organise items by aisle. The app can be used independently, but an optional self-hosted sync server can be configured to allow synchronisation across devices for multiple users.
 
-## Recommended IDE Setup
+## App
 
-[VS Code](https://code.visualstudio.com/) + [Vue (Official)](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+The app is built with Vue and packaged for Android using [Capacitor](https://capacitorjs.com/), which provides access to native Android features. These include:
 
-## Recommended Browser Setup
+* Monitoring app state changes to trigger synchronisation.
+* Accessing the camera to scan QR codes for sharing settings.
 
-- Chromium-based browsers (Chrome, Edge, Brave, etc.):
-  - [Vue.js devtools](https://chromewebstore.google.com/detail/vuejs-devtools/nhdogjmejiglipccpnnnanhbledajbpd)
-  - [Turn on Custom Object Formatter in Chrome DevTools](http://bit.ly/object-formatters)
-- Firefox:
-  - [Vue.js devtools](https://addons.mozilla.org/en-US/firefox/addon/vue-js-devtools/)
-  - [Turn on Custom Object Formatter in Firefox DevTools](https://fxdx.dev/firefox-devtools-custom-object-formatters/)
+Shoppi currently supports two AI providers for item categorisation:
 
-## Type Support for `.vue` Imports in TS
+* **Gemini**
+* **Groq**
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) to make the TypeScript language service aware of `.vue` types.
+Both providers offer free API keys. The AI provider and the optional sync server can be configured from the app's settings page.
 
-## Customize configuration
+## Sync Server
 
-See [Vite Configuration Reference](https://vite.dev/config/).
+The optional sync server is an API built with [Hono](https://hono.dev/) and uses an SQLite database. It allows multiple users to keep their shopping lists synchronised across devices.
 
-## Project Setup
+To install the server on a VPS, run the following commands:
 
-```sh
-npm install
+```bash
+curl -fsSL https://dl.josephchaouistannard.com/scripts/shoppi-install-script.sh -o shoppi-deploy-script.sh
+chmod +x shoppi-deploy-script.sh
+./shoppi-deploy-script.sh
 ```
 
-### Compile and Hot-Reload for Development
+The installation script:
 
-```sh
-npm run dev
-```
+1. Clones the [shoppi-api-hono](https://github.com/josephchaouistannard/shoppi-api-hono/) repository.
+2. Builds the Docker image.
+3. Starts the API on port `3000`.
 
-### Type-Check, Compile and Minify for Production
-
-```sh
-npm run build
-```
-
-### Run Unit Tests with [Vitest](https://vitest.dev/)
-
-```sh
-npm run test:unit
-```
-
-### Lint with [ESLint](https://eslint.org/)
-
-```sh
-npm run lint
-```
+Once the server is running, save the API URL and your chosen API key in the app's settings to enable synchronisation.
