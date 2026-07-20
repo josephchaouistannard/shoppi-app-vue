@@ -17,19 +17,23 @@ export const useSettingsStore = defineStore('settings', () => {
     const normalizedUrl = url.trim().match(/^https?:\/\//) ? url.trim() : `https://${url.trim()}`
 
     apiUrl.value = normalizedUrl
-    localStorage.setItem(API_URL_KEY, normalizedUrl)
+    persistApiSettings()
   }
 
   function setApiToken(token: string) {
     apiToken.value = token
-    localStorage.setItem(API_TOKEN_KEY, token)
+    persistApiSettings()
+  }
+
+  function persistApiSettings() {
+    localStorage.setItem(API_TOKEN_KEY, apiToken.value)
+    localStorage.setItem(API_URL_KEY, apiUrl.value)
   }
 
   function resetSyncServer() {
     apiUrl.value = ''
-    localStorage.setItem(API_URL_KEY, '')
     apiToken.value = ''
-    localStorage.setItem(API_TOKEN_KEY, '')
+    persistApiSettings()
   }
 
   // LANGUAGE
@@ -38,7 +42,11 @@ export const useSettingsStore = defineStore('settings', () => {
 
   function setLangCategories(lang: string) {
     langCategories.value = lang
-    localStorage.setItem(LANG_CAT_KEY, lang)
+    persistLangSettings()
+  }
+
+  function persistLangSettings() {
+    localStorage.setItem(LANG_CAT_KEY, langCategories.value)
   }
 
   // AI CATEGORISATION
@@ -146,5 +154,8 @@ export const useSettingsStore = defineStore('settings', () => {
     updateProviderApiKey,
     deleteProviderApiKey,
     resetSyncServer,
+    persistApiSettings,
+    persistLangSettings,
+    persistProviders,
   }
 })

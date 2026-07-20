@@ -114,6 +114,9 @@ async function scanQR() {
       const importedSettings = JSON.parse(decodedJsonString);
 
       settingsStore.$state = importedSettings
+      settingsStore.persistApiSettings()
+      settingsStore.persistLangSettings()
+      settingsStore.persistProviders()
 
       toasts.addToast('Setting imported', 'success')
     }
