@@ -70,9 +70,11 @@ async function handleCategorisation() {
 
   categorisationInProgress.value = true
   try {
+    const itemsToSend = itemsStore.items.filter(item => item.isDeleted === false)
+
     const response = await categoriseWithAI(
       activeProvider.name,
-      itemsStore.items,
+      itemsToSend,
       activeProvider.apiKey,
       settingsStore.langCategories,
     )
