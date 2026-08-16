@@ -208,7 +208,7 @@ async function categoriseWithGroq(items: TItem[], apiKey: string, systemPrompt: 
           content: userPrompt,
         },
       ],
-      model: 'llama-3.3-70b-versatile',
+      model: 'openai/gpt-oss-120b',
       response_format: { type: 'json_object' },
     })
 

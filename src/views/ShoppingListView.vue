@@ -7,6 +7,10 @@ import { useSettingsStore } from '@/stores/settings'
 import { categoriseWithAI } from '@/utils/categoriseWithAI'
 import { useToast } from '@/composables/toast'
 import { Share } from '@capacitor/share'
+import { checkForUpdate } from '@/utils/versionCheck'
+import { AppLauncher } from '@capacitor/app-launcher'
+
+
 
 const toasts = useToast()
 const settingsStore = useSettingsStore()
@@ -16,11 +20,30 @@ const router = useRouter()
 const newItemName = ref('')
 const categorisationInProgress = ref(false)
 
-onMounted(() => {
+const updateAvailable = ref(false)
+
+
+onMounted(async () => {
   if (!settingsStore.missingApiSettings) {
     itemsStore.triggerDebouncedSync()
   }
+
+  const currentVersion = __APP_VERSION__
+  console.log('Current version', currentVersion)
+
+  const update = await checkForUpdate(currentVersion)
+
+  if (update.available) {
+    console.log(`New version: ${update.version}`)
+    updateAvailable.value = true
+  }
 })
+
+async function goToGithubReleases() {
+  await AppLauncher.openUrl({
+    url: 'https://github.com/josephchaouistannard/predictio-vue-app/releases/latest',
+  });
+}
 
 async function shareList() {
   const list = itemsStore.categories
@@ -114,7 +137,11 @@ function handleRemove(id: string) {
       <div v-else class="catSpinnerContainer">
         <div class="spinner"></div>
       </div>
+      <button v-if="updateAvailable" class="icon-button" @click="goToGithubReleases" aria-label="Edit Players">
+        <span class="material-symbols-outlined">upgrade</span>
+      </button>
       <img class="settingsBtn" src="../assets/settings.svg" @click="router.push('/settings')" />
+
     </header>
 
     <section class="newItemSection">
