@@ -267,7 +267,6 @@ input {
   border: 1px solid var(--color-border, #d9d9d9);
   border-radius: var(--radius-sm, 6px);
   padding: 0.4em 0.6em;
-  font-size: 0.9rem;
   width: 100%;
   box-sizing: border-box;
 }
@@ -293,12 +292,12 @@ input:focus {
 .listItem {
   width: 90%;
   margin: auto;
-  font-size: var(--font-size-sm);
+  font-size: var(--font-size-md);
   display: flex;
   flex-direction: row;
   align-items: center;
   justify-content: space-between;
-  padding: var(--space-xs);
+  padding: var(--space-sm);
   text-transform: capitalize;
 }
 </style>
