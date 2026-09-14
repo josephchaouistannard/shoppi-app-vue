@@ -13,9 +13,19 @@ export const useItemsStore = defineStore('items', () => {
   const items = ref<TItem[]>([])
   const ITEMS_KEY = 'items'
   const count = computed(() => items.value.length)
-  const categoriesNotDeleted = computed(() => [
-    ...new Set(items.value.filter((item) => !item.isDeleted).map((item) => item.category)),
-  ])
+  const categoriesNotDeleted = computed(() => {
+    const activeCategories = new Set(items.value
+      .filter((item) => !item.isDeleted && item)
+      .map((item) => item.category)
+    )
+
+    const allCategories = [
+      ...new Set(items.value.map((item)=> item.category))
+    ]
+
+    return allCategories.filter((cat) => activeCategories.has(cat))
+
+  })
   const itemsByCategoryNotDeleted = computed(() => {
     return (cat: string | null) =>
       items.value.filter((item) => item.category === cat && !item.isDeleted)
