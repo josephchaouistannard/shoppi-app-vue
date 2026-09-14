@@ -22,7 +22,6 @@ const categorisationInProgress = ref(false)
 
 const updateAvailable = ref(false)
 
-
 onMounted(async () => {
   if (!settingsStore.missingApiSettings) {
     itemsStore.triggerDebouncedSync()
@@ -71,6 +70,7 @@ function handleAddItem() {
   }
   itemsStore.addItem(newItemName.value)
   newItemName.value = ''
+  newItemTextInput.focus()
 }
 
 async function handleCategorisation() {
@@ -147,7 +147,7 @@ function handleRemove(id: string) {
     <section class="newItemSection">
       <small>Add a new item:</small>
       <div>
-        <input type="text" v-model="newItemName" @keyup.enter="handleAddItem" />
+        <input id="newItemTextInput" type="text" v-model="newItemName" @keyup.enter="handleAddItem" />
         <img src="../assets/add.svg" class="addBtn" @click="handleAddItem" />
       </div>
     </section>
