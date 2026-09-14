@@ -150,7 +150,7 @@ export const useItemsStore = defineStore('items', () => {
     clearTimeout(syncTimeout)
     syncTimeout = setTimeout(() => {
       syncWithServer()
-    }, 3000)
+    }, 5000)
   }
 
   return {
