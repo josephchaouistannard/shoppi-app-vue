@@ -93,6 +93,7 @@ async function handleCategorisation() {
 
   categorisationInProgress.value = true
   try {
+    itemsStore.triggerDebouncedSync()
     const itemsToSend = itemsStore.items.filter(item => item.isDeleted === false)
 
     const response = await categoriseWithAI(
@@ -119,6 +120,12 @@ async function handleCategorisation() {
 
 function handleRemove(id: string) {
   itemsStore.removeItem(id)
+}
+
+async function debouncedSync() {
+  if (!settingsStore.missingApiSettings) {
+    itemsStore.triggerDebouncedSync()
+  }
 }
 </script>
 
@@ -147,7 +154,8 @@ function handleRemove(id: string) {
     <section class="newItemSection">
       <small>Add a new item:</small>
       <div>
-        <input id="newItemTextInput" type="text" v-model="newItemName" @keyup.enter="handleAddItem" />
+        <input id="newItemTextInput" type="text" v-model="newItemName" @keyup.enter="handleAddItem"
+          @input="debouncedSync" @focus="debouncedSync" />
         <img src="../assets/add.svg" class="addBtn" @click="handleAddItem" />
       </div>
     </section>
